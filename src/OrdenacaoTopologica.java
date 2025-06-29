@@ -160,26 +160,29 @@ public class OrdenacaoTopologica {
 
     private boolean executaLogicaComum(boolean imprimir) {
         Elo cabecaFila = null;
-        Elo fimFila = null;
-        Elo p = prim;
-        prim = null;
+        Elo outrosNos = null;
+        Elo p = this.prim;
 
-        while(p != null) {
+        while (p != null) {
             Elo proximo = p.prox;
-            if(p.contador == 0) {
-                p.prox = null;
-                if(cabecaFila == null) {
-                    cabecaFila = p;
-                    fimFila = p;
-                } else {
-                    fimFila.prox = p;
-                    fimFila = p;
-                }
+            if (p.contador == 0) {
+                p.prox = cabecaFila;
+                cabecaFila = p;
             } else {
-                p.prox = prim;
-                prim = p;
+                p.prox = outrosNos;
+                outrosNos = p;
             }
             p = proximo;
+        }
+
+        this.prim = outrosNos;
+
+        Elo fimFila = null;
+        if (cabecaFila != null) {
+            fimFila = cabecaFila;
+            while (fimFila.prox != null) {
+                fimFila = fimFila.prox;
+            }
         }
 
         int elementosOrdenados = 0;
@@ -187,13 +190,8 @@ public class OrdenacaoTopologica {
             System.out.println("Ordenacao topologica");
         }
 
-        while (cabecaFila != null) {
-            Elo q = cabecaFila;
-            cabecaFila = q.prox;
-            if (cabecaFila == null) {
-                fimFila = null;
-            }
-
+        Elo q = cabecaFila;
+        while (q != null) {
             if (imprimir) {
                 System.out.print(q.chave + " ");
             }
@@ -204,24 +202,24 @@ public class OrdenacaoTopologica {
                 Elo t = suc.id;
                 t.contador--;
                 if (t.contador == 0) {
-                    if (cabecaFila == null) {
+                    t.prox = null;
+                    if (fimFila == null) {
                         cabecaFila = t;
                         fimFila = t;
                     } else {
                         fimFila.prox = t;
                         fimFila = t;
                     }
-                    if (fimFila != null) {
-                        fimFila.prox = null;
-                    }
                 }
                 suc = suc.prox;
             }
+            q = q.prox;
         }
 
         if (imprimir) {
             System.out.println("\n");
         }
+
         return elementosOrdenados == n;
     }
 }
