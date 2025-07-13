@@ -50,13 +50,14 @@ public class OrdenacaoTopologica {
             maxVertice = Math.max(maxVertice, Math.max(grafo[i][0], grafo[i][1]));
         }
 
+        Elo[] mapaDeElos = new Elo[maxVertice + 1];
         for (int i = 0; i <= maxVertice; i++) {
-            procuraOuCriaElo(i);
+            mapaDeElos[i] = procuraOuCriaElo(i);
         }
 
         for (int i = 0; i < grafo.length; i++) {
-            Elo eloX = procuraOuCriaElo(grafo[i][0]);
-            Elo eloY = procuraOuCriaElo(grafo[i][1]);
+            Elo eloX = mapaDeElos[grafo[i][0]];
+            Elo eloY = mapaDeElos[grafo[i][1]];
 
             EloSuc novoSuc = new EloSuc(eloY, eloX.listaSuc);
             eloX.listaSuc = novoSuc;
@@ -151,7 +152,10 @@ public class OrdenacaoTopologica {
 
     public boolean executa() {
         debug();
-        return executaLogicaComum(true);
+        System.out.println("Ordenacao topologica:");
+        boolean resultado = executaLogicaComum(true);
+        System.out.println();
+        return resultado;
     }
 
     public boolean executaSilencioso() {
@@ -186,9 +190,6 @@ public class OrdenacaoTopologica {
         }
 
         int elementosOrdenados = 0;
-        if (imprimir) {
-            System.out.println("Ordenacao topologica");
-        }
 
         Elo q = cabecaFila;
         while (q != null) {
@@ -214,10 +215,6 @@ public class OrdenacaoTopologica {
                 suc = suc.prox;
             }
             q = q.prox;
-        }
-
-        if (imprimir) {
-            System.out.println("\n");
         }
 
         return elementosOrdenados == n;
