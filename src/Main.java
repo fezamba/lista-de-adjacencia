@@ -1,6 +1,6 @@
 public class Main {
     public static void main(String[] args) {
-        System.out.println("--- Execucao a partir do arquivo 'entrada.txt' ---");
+        System.out.println("--- Execucao a partir do arquivo 'entrada.txt' (Debug) ---");
         executarDeArquivo();
         System.out.println("--------------------------------------------------\n");
 
@@ -26,29 +26,37 @@ public class Main {
         int numExecucoes = 10;
         double densidadeArestas = 1.5;
 
-        System.out.println("Vertices | Tempo Medio (ms) para cada execução");
-        System.out.println("---------|------------------");
+        System.out.println("Vertices | Tempos Individuais (ns) e Tempo Medio (ms)");
+        System.out.println("---------|----------------------------------------------");
 
         for (int n : tamanhos) {
-            long tempoTotal = 0;
             int numArestas = (int)(n * densidadeArestas);
 
-            for (int i = 0; i < numExecucoes; i++) {
-                int[][] grafo = GeradorGrafo.gerarDAG(n, numArestas);
+            // Gera o grafo UMA VEZ por tamanho de 'n'
+            int[][] grafo = GeradorGrafo.gerarDAG(n, numArestas);
 
+            long tempoTotal = 0;
+
+            System.out.printf("%-8d | ", n);
+
+            // Executa o benchmark 10x NO MESMO GRAFO
+            for (int i = 0; i < numExecucoes; i++) {
+                // Cria uma nova instância para garantir que o grafo esteja no estado original
                 OrdenacaoTopologica ord = new OrdenacaoTopologica(grafo);
 
                 long inicio = System.nanoTime();
-                ord.executaSilencioso();
+                ord.executaSilencioso(); // Apenas a ordenação é medida
                 long fim = System.nanoTime();
 
-                tempoTotal += (fim - inicio);
+                long duracaoExecucao = fim - inicio;
+                System.out.print(duracaoExecucao + " ");
+                tempoTotal += duracaoExecucao;
             }
 
             double tempoMedioNano = (double) tempoTotal / numExecucoes;
             double tempoMedioMilli = tempoMedioNano / 1_000_000.0;
 
-            System.out.printf("%-8d | %.4f\n", n, tempoMedioMilli);
+            System.out.printf("| Media: %.4f ms\n", tempoMedioMilli);
         }
     }
 }
